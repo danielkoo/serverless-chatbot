@@ -40,6 +40,8 @@ module.exports.endpoint = (event, context, callback) => {
 
       callback(null, { statusCode: 200 });
     });
+  } else {
+      callback(null, { statusCode: 200 });
   }
 };
 
