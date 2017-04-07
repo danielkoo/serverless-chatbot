@@ -24,15 +24,20 @@ provider:
 
 
 # you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
+  stage: dev
+  region: us-east-1
 
 # you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:GetObject"
+        - "s3:PutObject"
+      Resource: arn:aws:s3:::${self:custom.uploadBucket}/*
+
+custom:
+  uploadBucket: ${self:service}-${self:provider.stage}-uploads
+
 #    - Effect: "Allow"
 #      Action:
 #        - "s3:PutObject"
@@ -44,12 +49,6 @@ provider:
 #            - "/*"
 
 # you can define service wide environment variables here
-  environment:
-    POST_MESSAGE_URL: 'https://slack.com/api/chat.postMessage?'
-    BOT_ACCESS_TOKEN: 'xoxb-165976169429-AIZAPJWiWpdcM1uZ143YlDhq'
-    BOT_ID: 'U4VUQ4ZCM'
-    VERIFICATION_TOKEN: 'YFqE3vAA64VewqXPgUcZEQTu'
-
 # you can add packaging information here
 #package:
 #  include:
@@ -66,6 +65,20 @@ functions:
       - http:
           path: echo
           method: post
+    environment:
+      POST_MESSAGE_URL: 'https://slack.com/api/chat.postMessage?'
+      BOT_ACCESS_TOKEN: 'xoxb-165976169429-AIZAPJWiWpdcM1uZ143YlDhq'
+      BOT_ID: 'U4VUQ4ZCM'
+      VERIFICATION_TOKEN: 'YFqE3vAA64VewqXPgUcZEQTu'
+      UPLOAD_BUCKET: ${self:custom.uploadBucket}
+      SLACK_HOSTNAME: 'files.slack.com'
+      TEMP_FOLDER: '/tmp/'
+  faceswap:
+    handler: faceswap.execute
+    events:
+      - s3:
+          bucket: ${self:custom.uploadBucket}
+          event: s3:ObjectCreated:*
   bot:
     handler: bot.endpoint
 
