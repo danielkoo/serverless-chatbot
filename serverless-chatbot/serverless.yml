@@ -44,8 +44,11 @@ provider:
 #            - "/*"
 
 # you can define service wide environment variables here
-#  environment:
-#    variable1: value1
+  environment:
+    POST_MESSAGE_URL: 'https://slack.com/api/chat.postMessage?'
+    BOT_ACCESS_TOKEN: 'xoxb-165976169429-AIZAPJWiWpdcM1uZ143YlDhq'
+    BOT_ID: 'U4VUQ4ZCM'
+    VERIFICATION_TOKEN: 'YFqE3vAA64VewqXPgUcZEQTu'
 
 # you can add packaging information here
 #package:
@@ -58,7 +61,13 @@ provider:
 
 functions:
   hello:
-    handler: handler.hello
+    handler: handler.endpoint
+    events:
+      - http:
+          path: echo
+          method: post
+  bot:
+    handler: bot.endpoint
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
